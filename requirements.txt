@@ -3,10 +3,9 @@ pandas
 numpy
 scikit-learn
 tensorflow
-joblib
-openpyxl
-os
+rdkit-pypi
 xgboost
-rdkit
 gdown
+requests
+joblib
 
