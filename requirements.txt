@@ -3,9 +3,10 @@ pandas
 numpy
 scikit-learn
 tensorflow
-rdkit-pypi
+rdkit
 xgboost
 gdown
 requests
 joblib
+
 
