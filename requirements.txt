@@ -8,5 +8,7 @@ xgboost
 gdown
 requests
 joblib
+openpyxl
+
 
 
