@@ -7,4 +7,6 @@ joblib
 rdkit-pypi
 openpyxl
 os
+xgboost
 rdkit
+gdown
