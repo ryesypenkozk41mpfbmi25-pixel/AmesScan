@@ -10,6 +10,8 @@ from tensorflow.keras.regularizers import l2
 from tensorflow.keras.optimizers import Nadam
 from rdkit.Chem import Descriptors
 from rdkit import Chem
+import gdown
+import requests
 
 class KerasNNWrapper(BaseEstimator, ClassifierMixin):
     def __init__(self, input_dim=None, lr=0.001, epochs=30, batch_size=32, verbose=0,
@@ -54,8 +56,15 @@ class KerasNNWrapper(BaseEstimator, ClassifierMixin):
         pred = self.model_.predict(X)
         return np.vstack([1 - pred.ravel(), pred.ravel()]).T
 
-# Шлях до моделей
-MODELS_PATH = "E:\\Магістерська\\Моделі"
+MODELS_PATH = "models"
+os.makedirs(MODELS_PATH, exist_ok=True)
+
+def download_model_from_drive(file_id, filename):
+    url = f"https://drive.google.com/uc?id={file_id}"
+    out_path = os.path.join(MODELS_PATH, filename)
+    if not os.path.exists(out_path):
+        gdown.download(url, out_path, quiet=False)
+    return out_path
 
 # Словник доступних моделей
 available_models = {
@@ -129,6 +138,78 @@ available_models = {
     }
 }
 
+# Словник доступних моделей
+available_models2 = {
+    "Random Forest": {
+        "Mordred": {
+            "Всі": "1pv4secP_mHC8f7eWeBt29k1VLnn7XJDe",
+            "Аліфатичні ациклічні": "1wZXw5YwsFtd7nejxjde1f-aUgI2ymP_S",
+            "Аліфатичні гетероциклічні": "118X6QcqV6i-Q5fEoS7sMK4Ca2kcun9dd",
+            "Ароматичні гетероциклічні": "1aM4RUrVvJiSqDzdx7ROpFn-1dttjtNab",
+            "Ароматичні гомоциклічні": "1JKuOrpQU5t-0n2bLRmYZF7lHd-YNagzz"
+        },
+        "PaDEL": {
+            "Всі": "1VVcD1jez6h1sfVIqyy_-Y985ZDPuaUYi",
+            "Аліфатичні ациклічні": "1AnyrGIN8YHPM6vauaGQiDK4s4KooNoMV",
+            "Аліфатичні гетероциклічні": "1OTk9EkMMkjjAjGR7DqntQ8yXfDlqbcmk",
+            "Ароматичні гетероциклічні": "1h8YgqtJ6H3P8ba7WHFgEsmooJ3uN4uzK",
+            "Ароматичні гомоциклічні": "115cnVxY3NQah10ZNS50A18KHWbHEg5Qj"
+        },
+        "RDKit": {
+            "Всі": "1OiFvjUKqblW4hom7mP-4FLGbbrOrjCy8",
+            "Аліфатичні ациклічні": "1q_MkbGKWPzOGZ08BnVDW82TuTZFpAIUj",
+            "Аліфатичні гетероциклічні": "1-cQEhRWDHyLHpDVVNgwQAttpAVg_dqFk",
+            "Ароматичні гетероциклічні": "18RVgyCmbs27Y3LsG2u98VkwYLyA1XTDZ",
+            "Ароматичні гомоциклічні": "1jWK0IcVJmNLlhrLVRe4Cp1mgOtkHJcD5"
+        }
+    },
+    "Boosting": {
+        "Mordred": {
+            "Всі": "1w2ItdAsDj033TGVRNTpqrHlR8a4SLhev",
+            "Аліфатичні ациклічні": "1B5yeeidgex9srxieXKxkylag93Iy9iW0",
+            "Аліфатичні гетероциклічні": "1W7cvJMf-s99NVAgYlFlto8b2jM4acNFI",
+            "Ароматичні гетероциклічні": "1I7QwKc0pPdgUY9UxeHkZOnBYto_buMkD",
+            "Ароматичні гомоциклічні": "1IbNUY3CzA9KitH6DmQeG76xCk2XeqP28"
+        },
+        "PaDEL": {
+            "Всі": "1hc1houoqpU0vWtWf73VV9rXimZQBNJQ_",
+            "Аліфатичні ациклічні": "1znSN_NQsxDBXBVZ5FQrzg6lMnVI56OAw",
+            "Аліфатичні гетероциклічні": "1esmh0zAePZFUaOloWPo6c924W3BFKeGm",
+            "Ароматичні гетероциклічні": "1qwDQPQPHwwOr_33cAbcCd3BHPFvbEJ2q",
+            "Ароматичні гомоциклічні": "15dH_u0NR87HGbDyO4Z_tQ7V2Uu4_Mpt2"
+        },
+        "RDKit": {
+            "Всі": "1N41_t9myC9RNL7IFT2SVZtsyZn9LeGVt",
+            "Аліфатичні ациклічні": "1w80izq8_jcopv-CpS4-TfYldMFVGaRwa",
+            "Аліфатичні гетероциклічні": "1AUA51utgoZo8tGdIxJvIfizzShPJDlMk",
+            "Ароматичні гетероциклічні": "12IFWcGkv73uZ4O1026bYVuWTla40v1vb",
+            "Ароматичні гомоциклічні": "19DNaPEr5eB4UJV2lFx4MpIm23YdaVIwy" }
+    },
+    "Neural Network": {
+        "Mordred": {
+            "Всі": "1PXrEvA2nEcFi04Rvt0zuUX7QvOVGgo3W",
+            "Аліфатичні ациклічні": "1D1DnRzQWGPXP-M-mam1zl_RCGRSzvoA5",
+            "Аліфатичні гетероциклічні": "1GU6Y1gLrP6tfLtBC0TwAQ7v9VfQNpZuN",
+            "Ароматичні гетероциклічні": "1YnMs2d4IMFYvncvs-NxBCXQmjr7Glcc1",
+            "Ароматичні гомоциклічні": "1WIHJOUAYtvziM-us76csGTkB7qfgpM4a"
+        },
+        "PaDEL": {
+            "Всі": "1lDRDFOGMhH3-Ev9TlefBDQb3ztJrezWr",
+            "Аліфатичні ациклічні": "1_TpWE3J7ywXWx2Hh5Q_dgd348TB6tUSr",
+            "Аліфатичні гетероциклічні": "16PeB5VnL_cTc4gNu-5iJz3FCWbpE1xw3",
+            "Ароматичні гетероциклічні": "1LcDp2PDWcBbI-kvM5di7f4RrZF9HF0Ys",
+            "Ароматичні гомоциклічні": "100Igu2pheFUz5Pd466RypXuoTcCDjCXl"
+        },
+        "RDKit": {
+            "Всі": "1ZNTp1-mNxfjF0PbcwUqSo_q5NuXjPYlG",
+            "Аліфатичні ациклічні": "1419IL9oUZbyNG7oaFYiSLYH27qL6y0GN",
+            "Аліфатичні гетероциклічні": "17QDCWH7vAeXdoYoSvGKsNO3d4bb8rY1a",
+            "Ароматичні гетероциклічні": "1d1SUx2XeQWiPH9Fa5CLFOb61_m5fNELC",
+            "Ароматичні гомоциклічні": "1GdcB1XGPIDRLoxoRSCCsmQ90NVMpumy3"
+        }
+    }
+}
+
 # автоматичні правила
 auto_rules = {
     "Всі": ("Boosting", "Mordred"),
@@ -138,13 +219,18 @@ auto_rules = {
     "Ароматичні гомоциклічні": ("Random Forest", "Mordred")
 }
 
+
 def load_model(model_type, descriptor, chem_class):
-    """Завантаження моделі"""
+    # Беремо file_id із available_models2
+    file_id = available_models2[model_type][descriptor][chem_class]
+
+    # Беремо точну назву файлу з available_models
     filename = available_models[model_type][descriptor][chem_class]
-    path = os.path.join(MODELS_PATH, filename)
-    if not os.path.exists(path):
-        st.error(f"❌ Файл моделі не знайдено: {filename}")
-        st.stop()
+
+    # Завантажуємо файл із Google Drive, якщо він ще не існує
+    path = download_model_from_drive(file_id, filename)
+
+    # Завантажуємо пайплайн
     return joblib.load(path)
 
 def make_prediction(df, pipeline_bundle, model_type):
@@ -297,7 +383,7 @@ if uploaded_file is not None:
             df = st.session_state.computed_df
 
             if st.button("🚀 Запустити прогноз"):
-                pipeline_bundle = load_model("Random Forest", "RDKit", chem_class)
+                pipeline_bundle = load_model(model_type, descriptor_choice, chem_class)
                 results = make_prediction(df, pipeline_bundle, "Random Forest")
 
                 st.success("✅ Прогноз виконано!")
