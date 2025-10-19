@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+scikit-learn
+tensorflow
+joblib
+rdkit-pypi
+openpyxl
+os
+rdkit
