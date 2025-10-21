@@ -253,10 +253,11 @@ def make_prediction(df, pipeline_bundle, model_type):
 
         X = df[all_features]
         X = X.replace([np.inf, -np.inf], 0).fillna(0)
-        if scaler is not None:
-            X = scaler.transform(X)
+        X = X.astype(np.float64)
         if quantile_transformer is not None:
             X = quantile_transformer.transform(X)
+        if scaler is not None:
+            X = scaler.transform(X)
         if selector is not None:
             X = selector.transform(X)
         preds = model.predict(X)
