@@ -10,6 +10,7 @@ from tensorflow.keras.regularizers import l2
 from tensorflow.keras.optimizers import Nadam
 from rdkit.Chem import Descriptors
 from rdkit import Chem
+from xgboost import XGBClassifier
 import gdown
 import requests
 
@@ -235,54 +236,51 @@ def load_model(model_type, descriptor, chem_class):
 
 def make_prediction(df, pipeline_bundle, model_type):
     """Обробка даних та прогноз"""
-    try:
-        if model_type in ["Random Forest", "Boosting"]:
-            selector = pipeline_bundle.get("selector")
-            scaler = pipeline_bundle.get("scaler")
-            quantile_transformer = pipeline_bundle.get("quantile_transformer")
-            all_features = pipeline_bundle["all_feature_names"]
-            model = pipeline_bundle["model"]
 
-            # Перевірка наявності всіх потрібних дескрипторів
-            missing_cols = set(all_features) - set(df.columns)
-            if missing_cols:
-                st.error(f"❌ У файлі не вистачає дескрипторів для моделі: {missing_cols}")
-                st.info("Скористайтеся сервісами для обчислення дескрипторів")
-                st.stop()
+    if model_type in ["Random Forest", "Boosting"]:
+        selector = pipeline_bundle.get("selector")
+        scaler = pipeline_bundle.get("scaler")
+        quantile_transformer = pipeline_bundle.get("quantile_transformer")
+        all_features = pipeline_bundle["all_feature_names"]
+        model = pipeline_bundle["model"]
 
-            X = df[all_features]
-            if scaler is not None:
-                X = scaler.transform(X)
-            if quantile_transformer is not None:
-                X = quantile_transformer.transform(X)
-            if selector is not None:
-                X = selector.transform(X)
-            preds = model.predict(X)
+        # Перевірка наявності всіх потрібних дескрипторів
+        missing_cols = set(all_features) - set(df.columns)
+        if missing_cols:
+            st.error(f"❌ У файлі не вистачає дескрипторів для моделі: {missing_cols}")
+            st.info("Скористайтеся сервісами для обчислення дескрипторів")
+            st.stop()
 
-        elif model_type == "Neural Network":
-            model = pipeline_bundle["model"]
-            selected_features = pipeline_bundle["selected_feature_names"]
-            missing_cols = set(selected_features) - set(df.columns)
-            if missing_cols:
-                st.error(f"❌ У файлі не вистачає дескрипторів для моделі: {missing_cols}")
-                st.info("Скористайтеся сервісами для обчислення дескрипторів")
-                st.stop()
-            X = df[selected_features]
-            preds = model.predict(X)
+        X = df[all_features]
+        if scaler is not None:
+            X = scaler.transform(X)
+        if quantile_transformer is not None:
+            X = quantile_transformer.transform(X)
+        if selector is not None:
+            X = selector.transform(X)
+        preds = model.predict(X)
 
-        # додаємо результат
-        df_out = df.copy()
-        labels = ["Ризик генотоксичності низький" if p == 0 else "Ризик генотоксичності високий" for p in preds]
-        df_out["Prediction"] = labels
+    elif model_type == "Neural Network":
+        model = pipeline_bundle["model"]
+        selected_features = pipeline_bundle["selected_feature_names"]
+        missing_cols = set(selected_features) - set(df.columns)
+        if missing_cols:
+            st.error(f"❌ У файлі не вистачає дескрипторів для моделі: {missing_cols}")
+            st.info("Скористайтеся сервісами для обчислення дескрипторів")
+            st.stop()
+        X = df[selected_features]
+        preds = model.predict(X)
 
-        return df_out
-    except Exception as e:
-        st.error(f"❌ Помилка під час прогнозу: {e}")
-        st.stop()
+    # додаємо результат
+    df_out = df.copy()
+    labels = ["Ризик генотоксичності низький" if p == 0 else "Ризик генотоксичності високий" for p in preds]
+    df_out["Prediction"] = labels
+
+    return df_out
 
 # --- Streamlit UI ---
-st.title("🧬 GenoToxiScan")
-st.set_page_config( page_title="GenoToxiScan", page_icon="🧬", layout="wide")
+st.title("🧬 AmesScan")
+st.set_page_config( page_title="AmesScan", page_icon="🧬", layout="wide")
 st.sidebar.header("Налаштування")
 
 descriptor_choice = st.sidebar.selectbox(
