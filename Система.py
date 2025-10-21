@@ -273,7 +273,7 @@ def make_prediction(df, pipeline_bundle, model_type):
 
     # додаємо результат
     df_out = df.copy()
-    labels = ["Ризик генотоксичності низький" if p == 0 else "Ризик генотоксичності високий" for p in preds]
+    labels = ["Ризик мутагенності високий" if p >= 0.5 else "Ризик мутагенності низький" for p in preds]
     df_out["Prediction"] = labels
 
     return df_out
@@ -382,7 +382,7 @@ if uploaded_file is not None:
 
             if st.button("🚀 Запустити прогноз"):
                 pipeline_bundle = load_model(model_type, descriptor_choice, chem_class)
-                results = make_prediction(df, pipeline_bundle, "Random Forest")
+                results = make_prediction(df, pipeline_bundle, model_type)
 
                 st.success("✅ Прогноз виконано!")
 
