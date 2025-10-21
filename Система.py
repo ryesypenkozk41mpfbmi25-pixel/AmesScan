@@ -252,6 +252,7 @@ def make_prediction(df, pipeline_bundle, model_type):
             st.stop()
 
         X = df[all_features]
+        X = X.replace([np.inf, -np.inf], 0).fillna(0)
         if scaler is not None:
             X = scaler.transform(X)
         if quantile_transformer is not None:
