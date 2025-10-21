@@ -10,6 +10,7 @@ from tensorflow.keras.regularizers import l2
 from tensorflow.keras.optimizers import Nadam
 from rdkit.Chem import Descriptors
 from rdkit import Chem
+from sklearn.preprocessing import QuantileTransformer, StandardScaler
 from xgboost import XGBClassifier
 import gdown
 import requests
@@ -271,6 +272,11 @@ def make_prediction(df, pipeline_bundle, model_type):
             st.info("Скористайтеся сервісами для обчислення дескрипторів")
             st.stop()
         X = df[selected_features]
+        X = X.replace([np.inf, -np.inf], np.nan).fillna(0)
+        X = np.float64(X.values)
+
+        X = QuantileTransformer(output_distribution='uniform').fit_transform(X)
+        X = StandardScaler().fit_transform(X)
         preds = model.predict(X)
 
     # додаємо результат
